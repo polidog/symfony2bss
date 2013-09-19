@@ -1,0 +1,7 @@
+parameters:
+#    sbbs_main.example.class: Sbbs\MainBundle\Example
+
+services:
+#    sbbs_main.example:
+#        class: %sbbs_main.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

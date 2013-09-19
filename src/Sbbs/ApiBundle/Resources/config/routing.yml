@@ -1,0 +1,3 @@
+sbbs_api_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: SbbsApiBundle:Default:index }

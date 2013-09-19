@@ -1,0 +1,7 @@
+parameters:
+#    sbbs_api.example.class: Sbbs\ApiBundle\Example
+
+services:
+#    sbbs_api.example:
+#        class: %sbbs_api.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

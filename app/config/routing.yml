@@ -1,0 +1,12 @@
+sbbs_api:
+    resource: "@SbbsApiBundle/Resources/config/routing.yml"
+    prefix:   /
+
+sbbs_front:
+    resource: "@SbbsFrontBundle/Resources/config/routing.yml"
+    prefix:   /
+
+sbbs_main:
+    resource: "@SbbsMainBundle/Resources/config/routing.yml"
+    prefix:   /
+
