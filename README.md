@@ -1,171 +1,140 @@
-Symfony Standard Edition
-========================
+symfony2のrest的なチュートリアルという事で記載してく
 
-Welcome to the Symfony Standard Edition - a fully-functional Symfony2
-application that you can use as the skeleton for your new applications.
+# バンドル構成
+* SbbsFrontBundle - アプリケーションの表示用の処理
+* SbbsApiBundle - Ajax処理とかこっちでやる
+* SbbsMainBundle - 実際の処理とかその辺
 
-This document contains information on how to download, install, and start
-using Symfony. For a more detailed explanation, see the [Installation][1]
-chapter of the Symfony Documentation.
+# データベースの設定
 
-1) Installing the Standard Edition
-----------------------------------
+まずはデータベースの作成から。
+```
+CREATE DATABASE `sbbs` DEFAULT CHARACTER SET 'utf8';
+```
 
-When it comes to installing the Symfony Standard Edition, you have the
-following options.
+# データベースへの接続設定
+次に、Symfony側でMySQLに作成したデータベースへ接続する設定を行います。
+ここではデータベースへ接続するユーザ名、パスワードも sbbs であると想定しています（お使いの環境に合わせて変更してください）。
 
-### Use Composer (*recommended*)
+app/config/parameters.ini を編集しましょう
+```
+parameters:
+    database_driver: pdo_mysql
+    database_host: 127.0.0.1
+    database_port: null
+    database_name: sbbs
+    database_user: sbbs
+    database_password: sbbs
+```
 
-As Symfony uses [Composer][2] to manage its dependencies, the recommended way
-to create a new project is to use it.
 
-If you don't have Composer yet, download it following the instructions on
-http://getcomposer.org/ or just run the following command:
+# マイグレーションの設定
+今回はマイグレーションを利用してデータベースを管理していきます。
+ということでマイグレーション用のバンドルを用意しましょう。
 
-    curl -s http://getcomposer.org/installer | php
+composer.jsonに以下を追記します
+```
+    "require": {
+		...
 
-Then, use the `create-project` command to generate a new Symfony application:
+			  "doctrine/migrations": "dev-master",
+			  "doctrine/doctrine-migrations-bundle": "dev-master"
+    },
+```
 
-    php composer.phar create-project symfony/framework-standard-edition path/to/install
+その後は以下のコマンドを実行してください。
+```
+$ php composer.phar update
+```
+あとはapp/AppKernel.phpに以下のように記載すればおk
+```
+class AppKernel extends Kernel
+{
+    public function registerBundles()
+    {
+        $bundles = array(
+            new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+            new Symfony\Bundle\SecurityBundle\SecurityBundle(),
+            new Symfony\Bundle\TwigBundle\TwigBundle(),
+            new Symfony\Bundle\MonologBundle\MonologBundle(),
+            new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
+            new Symfony\Bundle\AsseticBundle\AsseticBundle(),
+            new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
+            new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
 
-Composer will install Symfony and all its dependencies under the
-`path/to/install` directory.
+	    new Doctrine\Bundle\MigrationsBundle(),
+```
 
-### Download an Archive File
 
-To quickly test Symfony, you can also download an [archive][3] of the Standard
-Edition and unpack it somewhere under your web server root directory.
+# バンドルの作成を行う
+```
+ php app/console generate:bundle --namespace=Sbbs/MainBundle --format=yml
+ php app/console generate:bundle --namespace=Sbbs/FrontBundle --format=yml
+ php app/console generate:bundle --namespace=Sbbs/ApiBundle --format=yml
+```
 
-If you downloaded an archive "without vendors", you also need to install all
-the necessary dependencies. Download composer (see above) and run the
-following command:
+# エンティティとかテーブルを作成する
+以下のコマンドを実行してエンティティを作成します。
+```
+$ app/console generate:doctrine:entity --entity=SbbsMainBundle:Post --format=annotation --fields="title:string(255) body:text createdAt:datetime updatedAt:datetime deletedAt:datetime"
+```
 
-    php composer.phar install
+で、ここからが重要。
+今回はマイグレーションで管理するので以下のコマンドを実行して、マイグレーション用のファイルを作成します。
+```
+$ app/console doctrine:migrations:diff
+```
+これで、app/DoctrineMigrationsのなかにファイルが出来ていると思います。
+中をみるとこんな感じかと思います。シンプルでわかり易いですよね。
+```
+<?php
 
-2) Checking your System Configuration
--------------------------------------
+namespace Application\Migrations;
 
-Before starting coding, make sure that your local system is properly
-configured for Symfony.
+use Doctrine\DBAL\Migrations\AbstractMigration,
+    Doctrine\DBAL\Schema\Schema;
 
-Execute the `check.php` script from the command line:
+/**
+ * Auto-generated Migration: Please modify to your needs!
+ */
+class Version20130920023015 extends AbstractMigration
+{
+    public function up(Schema $schema)
+    {
+        // this up() migration is auto-generated, please modify it to your needs
+        $this->abortIf($this->connection->getDatabasePlatform()->getName() != "mysql", "Migration can only be executed safely on 'mysql'.");
 
-    php app/check.php
+        $this->addSql("CREATE TABLE Post (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) NOT NULL, body LONGTEXT NOT NULL, createdAt DATETIME NOT NULL, updatedAt DATETIME NOT NULL, deletedAt DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB");
+    }
 
-The script returns a status code of `0` if all mandatory requirements are met,
-`1` otherwise.
+    public function down(Schema $schema)
+    {
+        // this down() migration is auto-generated, please modify it to your needs
+        $this->abortIf($this->connection->getDatabasePlatform()->getName() != "mysql", "Migration can only be executed safely on 'mysql'.");
 
-Access the `config.php` script from a browser:
+        $this->addSql("DROP TABLE Post");
+    }
+}
+```
 
-    http://localhost/path/to/symfony/app/web/config.php
+そして、これをデータベースに反映していきましょう。
 
-If you get any warnings or recommendations, fix them before moving on.
+```
+$ app/console doctrine:migrations:migreate
+```
 
-3) Browsing the Demo Application
---------------------------------
+これだけでテーブルの反映ができます。
+本当に作られてるか確認すると
 
-Congratulations! You're now ready to use Symfony.
-
-From the `config.php` page, click the "Bypass configuration and go to the
-Welcome page" link to load up your first Symfony page.
-
-You can also use a web-based configurator by clicking on the "Configure your
-Symfony Application online" link of the `config.php` page.
-
-To see a real-live Symfony page in action, access the following page:
-
-    web/app_dev.php/demo/hello/Fabien
-
-4) Getting started with Symfony
--------------------------------
-
-This distribution is meant to be the starting point for your Symfony
-applications, but it also contains some sample code that you can learn from
-and play with.
-
-A great way to start learning Symfony is via the [Quick Tour][4], which will
-take you through all the basic features of Symfony2.
-
-Once you're feeling good, you can move onto reading the official
-[Symfony2 book][5].
-
-A default bundle, `AcmeDemoBundle`, shows you Symfony2 in action. After
-playing with it, you can remove it by following these steps:
-
-  * delete the `src/Acme` directory;
-
-  * remove the routing entry referencing AcmeDemoBundle in `app/config/routing_dev.yml`;
-
-  * remove the AcmeDemoBundle from the registered bundles in `app/AppKernel.php`;
-
-  * remove the `web/bundles/acmedemo` directory;
-
-  * remove the `security.providers`, `security.firewalls.login` and
-    `security.firewalls.secured_area` entries in the `security.yml` file or
-    tweak the security configuration to fit your needs.
-
-What's inside?
----------------
-
-The Symfony Standard Edition is configured with the following defaults:
-
-  * Twig is the only configured template engine;
-
-  * Doctrine ORM/DBAL is configured;
-
-  * Swiftmailer is configured;
-
-  * Annotations for everything are enabled.
-
-It comes pre-configured with the following bundles:
-
-  * **FrameworkBundle** - The core Symfony framework bundle
-
-  * [**SensioFrameworkExtraBundle**][6] - Adds several enhancements, including
-    template and routing annotation capability
-
-  * [**DoctrineBundle**][7] - Adds support for the Doctrine ORM
-
-  * [**TwigBundle**][8] - Adds support for the Twig templating engine
-
-  * [**SecurityBundle**][9] - Adds security by integrating Symfony's security
-    component
-
-  * [**SwiftmailerBundle**][10] - Adds support for Swiftmailer, a library for
-    sending emails
-
-  * [**MonologBundle**][11] - Adds support for Monolog, a logging library
-
-  * [**AsseticBundle**][12] - Adds support for Assetic, an asset processing
-    library
-
-  * **WebProfilerBundle** (in dev/test env) - Adds profiling functionality and
-    the web debug toolbar
-
-  * **SensioDistributionBundle** (in dev/test env) - Adds functionality for
-    configuring and working with Symfony distributions
-
-  * [**SensioGeneratorBundle**][13] (in dev/test env) - Adds code generation
-    capabilities
-
-  * **AcmeDemoBundle** (in dev/test env) - A demo bundle with some example
-    code
-
-All libraries and bundles included in the Symfony Standard Edition are
-released under the MIT or BSD license.
-
-Enjoy!
-
-[1]:  http://symfony.com/doc/2.3/book/installation.html
-[2]:  http://getcomposer.org/
-[3]:  http://symfony.com/download
-[4]:  http://symfony.com/doc/2.3/quick_tour/the_big_picture.html
-[5]:  http://symfony.com/doc/2.3/index.html
-[6]:  http://symfony.com/doc/2.3/bundles/SensioFrameworkExtraBundle/index.html
-[7]:  http://symfony.com/doc/2.3/book/doctrine.html
-[8]:  http://symfony.com/doc/2.3/book/templating.html
-[9]:  http://symfony.com/doc/2.3/book/security.html
-[10]: http://symfony.com/doc/2.3/cookbook/email.html
-[11]: http://symfony.com/doc/2.3/cookbook/logging/monolog.html
-[12]: http://symfony.com/doc/2.3/cookbook/assetic/asset_management.html
-[13]: http://symfony.com/doc/2.3/bundles/SensioGeneratorBundle/index.html
+```
+mysql> show tables;
++--------------------+
+| Tables_in_sbbs     |
++--------------------+
+| Post               |
+| migration_versions |
++--------------------+
+2 rows in set (0.00 sec)
+```
+ちゃんと作れてますね。
+migration_versionsテーブルはマイグレーション管理用のテーブルになるので消さないように注意してください。
