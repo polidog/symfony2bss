@@ -1,18 +1,18 @@
-symfony2のrest的なチュートリアルという事で記載してく
+# symfony2のrest的なチュートリアルという事で記載してく
 
 # バンドル構成
 * SbbsFrontBundle - アプリケーションの表示用の処理
 * SbbsApiBundle - Ajax処理とかこっちでやる
 * SbbsMainBundle - 実際の処理とかその辺
 
-# データベースの設定
+## データベースの設定
 
 まずはデータベースの作成から。
 ```
 CREATE DATABASE `sbbs` DEFAULT CHARACTER SET 'utf8';
 ```
 
-# データベースへの接続設定
+## データベースへの接続設定
 次に、Symfony側でMySQLに作成したデータベースへ接続する設定を行います。
 ここではデータベースへ接続するユーザ名、パスワードも sbbs であると想定しています（お使いの環境に合わせて変更してください）。
 
@@ -28,7 +28,7 @@ parameters:
 ```
 
 
-# マイグレーションの設定
+## マイグレーションの設定
 今回はマイグレーションを利用してデータベースを管理していきます。
 ということでマイグレーション用のバンドルを用意しましょう。
 
@@ -66,7 +66,7 @@ class AppKernel extends Kernel
 ```
 
 
-# バンドルの作成を行う
+## バンドルの作成を行う
 ```
  php app/console generate:bundle --namespace=Sbbs/MainBundle --format=yml
  php app/console generate:bundle --namespace=Sbbs/FrontBundle --format=yml
