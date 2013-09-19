@@ -1,5 +1,5 @@
 <?php
-
+umask(0000);
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Composer\Autoload\ClassLoader;
 

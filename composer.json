@@ -20,8 +20,10 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
 
-			  "doctrine/migrations": "dev-master",
-			  "doctrine/doctrine-migrations-bundle": "dev-master"
+				"doctrine/migrations": "dev-master",
+				"doctrine/doctrine-migrations-bundle": "dev-master"
+
+
     },
     "scripts": {
         "post-install-cmd": [
