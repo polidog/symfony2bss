@@ -1,0 +1,57 @@
+<!DOCTYPE html5>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8" />
+		<title>{% block title %}{% endblock %} | Symfony2 Restful Bbs</title>
+		<link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+		{% block stylesheets %}
+			{% stylesheets '@SbbsFrontBundle/Resources/public/css/*' %}
+			<link rel="stylesheet" href="{{ asset_url }}" />
+			{% endstylesheets %}
+			<style>
+				body { padding-top: 70px; }
+			</style>
+		{% endblock %}
+	</head>
+	<body>
+		{% block header %}
+			<header class="navbar navbar-inverse navbar-fixed-top bs-docs-nav">
+				<div class="container">
+					<div class="navbar-header">
+						<a href="#" class="navbar-brand">Bbs</a>
+					</div>
+					<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+						<ul class="nav navbar-nav">
+							<li><a href="#bbsnew" class="js-bbs-new" data-toggle="modal">新規投稿</a></li>
+						</ul>
+					</nav>
+				</div>
+			</header>
+		{% endblock %}
+
+		<div class="container">
+			{% block content %}
+			{% endblock %}
+		</div>
+
+		{% javascripts
+			'@SbbsFrontBundle/Resources/public/js/lib/jquery-1.10.2.js'
+			'@SbbsFrontBundle/Resources/public/js/lib/bootstrap.js'
+			'@SbbsFrontBundle/Resources/public/js/lib/json2.js'
+			'@SbbsFrontBundle/Resources/public/js/lib/underscore.js'
+			'@SbbsFrontBundle/Resources/public/js/lib/backbone.js'
+			'@SbbsFrontBundle/Resources/public/js/app/namespace.js'
+			'@SbbsFrontBundle/Resources/public/js/app/model/*'
+			'@SbbsFrontBundle/Resources/public/js/app/collection/*'
+			'@SbbsFrontBundle/Resources/public/js/app/view/*'
+		%}
+			<script src="{{ asset_url }}"></script>
+		{% endjavascripts %}
+
+		{% block javascripts %}
+		{% endblock %}
+
+		{% include 'SbbsFrontBundle::Template/bbs_new.html.twig' %}
+
+	</body>
+</html>

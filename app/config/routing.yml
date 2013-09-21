@@ -3,7 +3,8 @@ sbbs_api:
     prefix:   /
 
 sbbs_front:
-    resource: "@SbbsFrontBundle/Resources/config/routing.yml"
+    resource: "@SbbsFrontBundle/Controller"
+    type: annotation
     prefix:   /
 
 sbbs_main:
