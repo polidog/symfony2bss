@@ -85,7 +85,7 @@ class AppKernel extends Kernel
  php app/console generate:bundle --namespace=Sbbs/ApiBundle --format=yml
 ```
 
-# エンティティとかテーブルを作成する
+## エンティティとかテーブルを作成する
 以下のコマンドを実行してエンティティを作成します。
 ```
 $ app/console generate:doctrine:entity --entity=SbbsMainBundle:Post --format=annotation --fields="title:string(255) body:text createdAt:datetime updatedAt:datetime deletedAt:datetime"
